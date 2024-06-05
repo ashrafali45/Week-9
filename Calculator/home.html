@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <style>
+    .calculator {
+      width: 320px;
+      margin: 100px auto;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #output {
+      width: calc(100% - 20px);
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 20px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #eee;
+    }
+
+    .operator {
+      background-color: orange;
+      color: #fff;
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" id="output" disabled>
+    <div class="buttons">
+      <button class="operator">C</button>
+      <button class="operator">+/-</button>
+      <button class="operator">%</button>
+      <button class="operator">÷</button>
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+      <button class="operator">x</button>
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+      <button class="operator">-</button>
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button class="operator">+</button>
+      <button class="zero">0</button>
+      <button>.</button>
+      <button class="operator">=</button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const output = document.getElementById("output");
+      const buttons = document.querySelectorAll("button");
+
+      let expression = "";
+      let lastOperator = "";
+
+      buttons.forEach(button => {
+        button.addEventListener("click", function() {
+          const value = this.textContent;
+
+          if (value === "C") {
+            expression = "";
+          } else if (value === "+/-") {
+            expression = toggleSign(expression);
+          } else if (value === "%") {
+            expression = parseFloat(expression) / 100;
+          } else if (value === "=") {
+            try {
+              expression = evaluateExpression(expression);
+            } catch (error) {
+              expression = "Error";
+            }
+          } else if (isOperator(value)) {
+            if (isOperator(lastOperator)) {
+              expression = expression.slice(0, -1) + value;
+            } else {
+              expression += value;
+            }
+            lastOperator = value;
+          } else {
+            expression += value;
+            lastOperator = "";
+          }
+
+          output.value = expression;
+        });
+      });
+
+      function isOperator(value) {
+        return ["+", "-", "x", "÷"].includes(value);
+      }
+
+      function toggleSign(exp) {
+        if (exp.startsWith("-")) {
+          return exp.slice(1);
+        } else {
+          return "-" + exp;
+        }
+      }
+
+      function evaluateExpression(exp) {
+        exp = exp.replace(/x/g, "*").replace(/÷/g, "/");
+        return new Function('return ' + exp)();
+      }
+    });
+  </script>
+</body>
+</html>
